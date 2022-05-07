@@ -1,0 +1,29 @@
+{
+  "name": "uss-validator",
+  "version": "1.0.0",
+  "author": "Michael R. Williams",
+  "description": "Provides validation for Universal Schedule Standard objects",
+  "main": "index.js",
+  "dependencies": {
+    "ajv": "^8.11.0"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/UniversalScheduleStandard/uss-validator.git"
+  },
+  "keywords": [
+    "validation",
+    "universal",
+    "schedule",
+    "standard"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/UniversalScheduleStandard/uss-validator/issues"
+  },
+  "homepage": "https://github.com/UniversalScheduleStandard/uss-validator#readme"
+}
