@@ -175,6 +175,24 @@ function _parityCheck_LinkedElementsInElements(obj) {
   }
 }
 
+// do all stripboard.boards.breakdownIds equal the number of breakdowns?
+function _parityCheck_BoardsBreakdownIdsEqualsBreakdowns(obj) {
+  try {
+    obj.universalScheduleStandard.stripboards.forEach(function(stripboard) {
+      var breakdownCount = 0
+      stripboard.boards.forEach(function(board) {
+        breakdownCount = breakdownCount + board.length
+      })
+      if(obj.universalScheduleStandard.breakdowns.length!==breakdownCount) {
+        return false
+      }
+    })
+    return true
+  } catch(e){
+    console.error(e)
+  }
+}
+
 // do all stripboards.boards.breakdownIds exist in breakdowns array?
 function _parityCheck_BoardsBreakdownIdsExistsInBreakdowns(obj) {
   try {
@@ -378,7 +396,7 @@ var _CalendarsHaveStartWarning = {
 
 const obj = {
   "universalScheduleStandard": {
-    "id": "5d9fc8cfc0efae0017a32a11",
+    "id": "2022-06-11T00:12:02.000Z",
     "author": "Michael R. Williams",
     "company": "RKO Pictures",
     "created": "2022-05-04T00:12:06.000Z",
