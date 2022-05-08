@@ -1,12 +1,14 @@
 var Ajv = require("ajv")
-var schema = require('./schemas/schema')
+var ussFullSchema = require('./schemas/ussFullSchema')
 
 /* 
 UNIVERSAL SCHEDULE STANDARD VALIDATOR
-Takes a USS object, checks whether it's valid JSON, then validates against a schema
-Returns an object with isValid boolean and an array of errors, if any
+Takes a USS object, checks whether it's valid JSON, then validates against a ussFullSchema.
+Returns an object with isValid boolean, an info object and an array of errors, if any.
+This is written in ES5 to ensure that the module has wide compatibility
 */
 
+// PRIMARY FUNCTION
 function validator(obj) {
   // establish response object
   var response = { 
@@ -18,32 +20,51 @@ function validator(obj) {
       stripboards: null, 
       calendars: null, 
       isSchedule: null,
+      name: null,
+      source: null,
+      ussVersion: null,
     },
-    errors: null 
+    errors: [],
+    warnings: []
   }
   try {
     if(_isJson(obj)) {
       // build ajv validator
       var ajv = new Ajv()
-      var validate = ajv.compile(schema)
+      var validateUSS = ajv.compile(ussFullSchema)
       // create an object from the JSON
       var objParsed = JSON.parse(JSON.stringify(obj))
       // check validation, collect any errors
-      response.isValid = validate(objParsed)
-      response.errors = validate.errors
+      response.isValid = validateUSS(objParsed)
+      response.errors = validateUSS.errors
+      // update info object
       response.info.breakdowns = _getArrayLengthForKey(objParsed, 'breakdowns')
       response.info.categories = _getArrayLengthForKey(objParsed, 'categories')
       response.info.elements = _getArrayLengthForKey(objParsed, 'elements')
       response.info.stripboards = _getArrayLengthForKey(objParsed, 'stripboards')
       response.info.calendars = _getArrayLengthForKey(objParsed, 'calendars')
       response.info.isSchedule = _isObjectASchedule(objParsed)
+      response.info.name = _getValueForKey(objParsed, 'name')
+      response.info.source = _getValueForKey(objParsed, 'source')
+      response.info.ussVersion = _getValueForKey(objParsed, 'version')
+
+      // check parity between object id arrays
+      if(!_parityCheck_BreakdownElementIdsInElements(objParsed)) response.warnings.push(_BreakdownElementIdsInElementsWarning)
+      if(!_parityCheck_CategoryElementIdsInElements(objParsed)) response.warnings.push(_CategoryElementIdsInElementsWarning)
+      if(!_parityCheck_ElementsBelongToCategories(objParsed)) response.warnings.push(_ElementsBelongToCategoriesWarning)
+      if(!_parityCheck_LinkedElementsInElements(objParsed)) response.warnings.push(_LinkedElementsInElementsWarning)
+      if(!_parityCheck_BoardsBreakdownIdsEqualsBreakdowns(objParsed)) response.warnings.push(_BoardsBreakdownIdsEqualsBreakdownsWarning)
+      if(!_parityCheck_BoardsBreakdownIdsExistsInBreakdowns(objParsed)) response.warnings.push(_BoardsBreakdownIdsExistsInBreakdownsWarning)
+      if(!_parityCheck_StripboardsHaveCalendar(objParsed)) response.warnings.push(_StripboardsHaveCalendarWarning)
+      if(!_parityCheck_CalendarsHaveStart(objParsed)) response.warnings.push(_CalendarsHaveStartWarning)
+
     } else { // obj is not JSON
       response.isValid = false
-      response.errors = isNotJsonError
+      response.errors.push(isNotJsonError)
     }
   } catch(e) {
     response.isValid = false
-    response.errors = _createGeneralErrorReponse(e)
+    response.errors.push(_createGeneralErrorReponse(e))
   } finally {
     // return response object
     console.log('response',response)
@@ -51,9 +72,203 @@ function validator(obj) {
   }
 }
 
+// PARITY CHECKS
+
+// are breakdown.elements ids all in the elments array?
+function _parityCheck_BreakdownElementIdsInElements(obj) {
+  try {
+    var idInArray = false
+    var elementIds = obj.universalScheduleStandard.elements.map(function(e){return e.id})
+    obj.universalScheduleStandard.breakdowns.forEach(function(breakdown) {
+      if(breakdown.elements.length>0) {
+        idInArray = _compareArrayIds(breakdown.elements, elementIds)
+        if(idInArray===false) {
+          return false
+        }
+      }      
+    })
+    return true
+  } catch(e){
+    console.error(e)
+  }
+}
+
+// are category.elements ids all in the elments array?
+function _parityCheck_CategoryElementIdsInElements(obj) {
+  try {
+    var idInArray = false
+    var elementIds = obj.universalScheduleStandard.elements.map(function(e){return e.id})
+    obj.universalScheduleStandard.categories.forEach(function(category) {
+      if(category.elements.length>0) {
+        idInArray = _compareArrayIds(category.elements, elementIds)
+        if(idInArray===false) {
+          return false
+        }
+      }      
+    })
+    return true
+  } catch(e){
+    console.error(e)
+  }
+}
+
+// are there any elements that don't belong to a category?
+function _parityCheck_ElementsBelongToCategories(obj) {
+  try {
+    var categories = obj.universalScheduleStandard.categories
+    obj.universalScheduleStandard.elements.forEach(function(element) {
+      var idInArray = false
+      for(var c=0;c<categories.length;c++) {
+        if(categories[c].elements.includes(element.id)) {
+          idInArray = true
+          break
+        }
+      }  
+      if(idInArray===false) {
+        return false
+      } 
+    })
+    return true
+  } catch(e){
+    console.error(e)
+  }
+}
+
+// do all elements.linkedElements exist in elements?
+function _parityCheck_LinkedElementsInElements(obj) {
+  try {
+    var elements = obj.universalScheduleStandard.elements
+    var elementIds = elements.map(function(e){return e.id})
+    elements.forEach(function(element) {
+      var idInArray = false
+      for(var c=0;c<element.linkedElements.length;c++) {
+        if(elementIds.includes(element.linkedElements[c])) {
+          idInArray = true
+          break
+        }
+      }  
+      if(idInArray===false) {
+        return false
+      } 
+    })
+    return true
+  } catch(e){
+    console.error(e)
+  }
+}
+
+// do all stripboards.boards.breakdownIds add up to the number of breakdowns
+function _parityCheck_LinkedElementsInElements(obj) {
+  try {
+    obj.universalScheduleStandard.stripboards.forEach(function(stripboard) {
+      var breakdownsCount = 0
+      stripboard.boards.forEach(function(board) {
+        breakdownsCount = breakdownsCount + board.breakdownIds.length
+      })
+      if(breakdownsCount!==obj.universalScheduleStandard.breakdowns.length) {
+        return false
+      }
+    })
+    return true
+  } catch(e){
+    console.error(e)
+  }
+}
+
+// do all stripboards.boards.breakdownIds exist in breakdowns array?
+function _parityCheck_BoardsBreakdownIdsExistsInBreakdowns(obj) {
+  try {
+    obj.universalScheduleStandard.stripboards.forEach(function(stripboard) {
+      var idInArray = false
+      stripboard.boards.forEach(function(board) {
+        for(var b=0;b<obj.universalScheduleStandard.breakdowns.length;b++) {
+          if(board.breakdownIds.includes(obj.universalScheduleStandard.breakdowns[b])) {
+            idInArray = true
+            break
+          }
+        }
+        if(idInArray===false) {
+          return false
+        }
+      })
+    })
+    return true
+  } catch(e){
+    console.error(e)
+  }
+}
+
+// do all stripboards have a calendar id?
+function _parityCheck_StripboardsHaveCalendar(obj) {
+  try {
+    obj.universalScheduleStandard.stripboards.forEach(function(stripboard) {
+      if(typeof stripboard.calendar !== 'string' && stripboard.calendar.length<1) {
+        return false
+      }
+    })
+    return true
+  } catch(e){
+    console.error(e)
+  }
+}
+
+// do all calendars have a start date event?
+function _parityCheck_CalendarsHaveStart(obj) {
+  try {
+    obj.universalScheduleStandard.calendars.forEach(function(calendar) {
+      var idInArray = false
+      for(var c=0;c<calendar.events.length;c++) {
+        if(calendar.events[c].type==='start') {
+          idInArray = true
+          break
+        }
+        if(idInArray===false) {
+          return false
+        }
+      }
+    })
+    return true
+  } catch(e){
+    console.error(e)
+  }
+}
+
+// HELPER FUNCTIONS
+
+// is everthing in arr1 in arr2
+function _compareArrayIds(arr1, arr2) {
+  try {
+    arr1.forEach(function(id1) {
+      var idFound = false
+      for(var e=0;e<arr2.length;e++) {
+        if(arr2[e]===id1) {
+          idFound = true
+          break
+        }
+      }
+      if(idFound===false) {
+        return false
+      }
+    })
+    return true
+  } catch(e){
+    console.error(e)
+  }
+}
+
+function _getValueForKey(obj, key) {
+  try {
+    return _doesUssObjectHaveKey(obj, key)
+      ? obj.universalScheduleStandard[key]
+      : null
+  } catch(e){
+    console.error(e)
+  }
+}
+
 function _getArrayLengthForKey(obj, key) {
   try {
-    return _doesUssObjectHaveKey(obj, key) && Array.isArray(obj.universalScheduleStandard[key])
+    return _doesUssObjectHaveKey(obj, key) && _isUssObjectKeyAnArray(obj, key)
       ? obj.universalScheduleStandard[key].length
       : null
   } catch(e){
@@ -69,9 +284,18 @@ function _doesUssObjectHaveKey(obj, key) {
   }
 }
 
+function _isUssObjectKeyAnArray(obj, key) {
+  try {
+    return Array.isArray(obj.universalScheduleStandard[key])
+  } catch(e) {
+    console.error(e)
+  }
+}
+
 function _isObjectASchedule(obj) {
   try {
-    return _doesUssObjectHaveKey(obj, 'stripboards') && _doesUssObjectHaveKey(obj, 'calendars')
+    return _doesUssObjectHaveKey(obj, 'stripboards') && _isUssObjectKeyAnArray(obj, 'stripboards') && _getArrayLengthForKey(obj, 'stripboards') > 0 &&
+           _doesUssObjectHaveKey(obj, 'calendars') && _isUssObjectKeyAnArray(obj, 'calendars') && _getArrayLengthForKey(obj, 'calendars') > 0
   } catch(e) {
     console.error(e)
   }
@@ -91,22 +315,62 @@ function _isJson(item) {
 }
 
 function _createGeneralErrorReponse(e) {
-  return [{ 
+  return { 
     instancePath: 'error',
-    schemaPath: 'error',
+    ussFullSchemaPath: 'error',
     keyword: 'error',
     params: { error: 'USS Validator Error' },
     message: e && e.message ? e.message : 'There was an unknown error in the USS Validator'
-  }]
+  }
 }
 
-var isNotJsonError = [{ 
+var isNotJsonError = { 
   instancePath: '/universalScheduleStandard',
-  schemaPath: '#/properties/universalScheduleStandard',
+  ussFullSchemaPath: '#/properties/universalScheduleStandard',
   keyword: 'type',
   params: { type: 'JSON' },
   message: 'must be a valid JSON object' 
-}]
+}
+
+var _BreakdownElementIdsInElementsWarning = {
+  title: 'Breakdown Elements', 
+  message: 'There are element IDs in at least one breakdown object that don\'t exist in the elements array'
+}
+
+var _CategoryElementIdsInElementsWarning = {
+  title: 'Category Elements', 
+  message: 'There are element IDs in at least one category object that don\'t exist in the elements array'
+}
+
+var _ElementsBelongToCategoriesWarning = {
+  title: 'Elements not in Category', 
+  message: 'There is at least one element that does not belong to a category'
+}
+
+var _LinkedElementsInElementsWarning = {
+  title: 'Linked Elements not in Elements', 
+  message: 'There is at least one linked element that does not appear in the elements array'
+}
+
+var _BoardsBreakdownIdsEqualsBreakdownsWarning = {
+  title: 'Boards does not equal Breakdowns', 
+  message: 'The number of breakdownIds in the boards does not equal the number of objects in the breakdowns array'
+}
+
+var _BoardsBreakdownIdsExistsInBreakdownsWarning = {
+  title: 'Boards breakdownIds not in Breakdowns', 
+  message: 'There are breakdownIds in the boards that are not in the breakdowns array'
+}
+
+var _StripboardsHaveCalendarWarning = {
+  title: 'Stripboard missing Calendar', 
+  message: 'There is a stripboard this is missing its calendarId'
+}
+
+var _CalendarsHaveStartWarning = {
+  title: 'Calendar missing start date', 
+  message: 'There is a calendar this is missing a start date event'
+}
 
 
 
@@ -114,7 +378,7 @@ var isNotJsonError = [{
 
 const obj = {
   "universalScheduleStandard": {
-    "id": "5cfe7d2510c4330017ab5ed5",
+    "id": "5d9fc8cfc0efae0017a32a11",
     "author": "Michael R. Williams",
     "company": "RKO Pictures",
     "created": "2022-05-04T00:12:06.000Z",
@@ -167,28 +431,6 @@ const obj = {
         "scriptPage":  null,
         "time": null,
         "type": "day"
-      }
-    ],
-
-    "calendars": [
-      {
-        "id" : "5d01230c987033001725c908",
-        "events" : [ 
-            {
-              "id" : "5dcee721d3ebb20017bbeb6a",
-              "type" : "start",
-              "name" : null,
-              "date" : "2022-06-20T08:00:00.000Z"
-            },
-            {
-              "id" : "5d3b5c6d35bc890017e4eacb",
-              "type" : "event",
-              "name" : "travel",
-              "date" : "2022-06-15T08:00:00.000Z"
-            }
-        ],
-        "daysOff" : [0, 6],
-        "name" : "Start on 6/20"
       }
     ],
 
@@ -365,8 +607,31 @@ const obj = {
         "calendar" : "5d01230c987033001725c908",
         "name" : "First Pass"
       }
+    ],
+
+    "calendars": [
+      {
+        "id" : "5d01230c987033001725c908",
+        "events" : [ 
+            {
+              "id" : "5dcee721d3ebb20017bbeb6a",
+              "type" : "start",
+              "name" : null,
+              "date" : "2022-06-20T08:00:00.000Z"
+            },
+            {
+              "id" : "5d3b5c6d35bc890017e4eacb",
+              "type" : "event",
+              "name" : "travel",
+              "date" : "2022-06-15T08:00:00.000Z"
+            }
+        ],
+        "daysOff" : [0, 6],
+        "name" : "Start on 6/20"
+      }
     ]
   }
 }
+
 
 validator(obj)

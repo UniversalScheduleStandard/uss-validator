@@ -4,7 +4,6 @@ module.exports = {
   properties: {
     universalScheduleStandard: {
       type: 'object',
-      minProperties: 19,
       properties: {
         id: {type: 'string'},
         author: {type: 'string', nullable: true},
