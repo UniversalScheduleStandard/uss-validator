@@ -5,7 +5,7 @@ var ussFullSchema = require('./schemas/ussFullSchema')
 UNIVERSAL SCHEDULE STANDARD VALIDATOR
 Takes a USS object, checks whether it's valid JSON, then validates against a ussFullSchema.
 Returns an object with isValid boolean, an info object and an array of errors, if any.
-This is written in ES5 to ensure that the module has wide compatibility
+This is written in ECMA Script 5 to ensure wide compatibility
 */
 
 // PRIMARY FUNCTION
@@ -32,11 +32,14 @@ function validator(obj) {
       // build ajv validator
       var ajv = new Ajv()
       var validateUSS = ajv.compile(ussFullSchema)
+
       // create an object from the JSON
       var objParsed = JSON.parse(JSON.stringify(obj))
+
       // check validation, collect any errors
       response.isValid = validateUSS(objParsed)
       response.errors = validateUSS.errors
+
       // update info object
       response.info.breakdowns = _getArrayLengthForKey(objParsed, 'breakdowns')
       response.info.categories = _getArrayLengthForKey(objParsed, 'categories')
@@ -49,14 +52,14 @@ function validator(obj) {
       response.info.ussVersion = _getValueForKey(objParsed, 'version')
 
       // check parity between object id arrays
-      if(!_parityCheck_BreakdownElementIdsInElements(objParsed)) response.warnings.push(_BreakdownElementIdsInElementsWarning)
-      if(!_parityCheck_CategoryElementIdsInElements(objParsed)) response.warnings.push(_CategoryElementIdsInElementsWarning)
-      if(!_parityCheck_ElementsBelongToCategories(objParsed)) response.warnings.push(_ElementsBelongToCategoriesWarning)
-      if(!_parityCheck_LinkedElementsInElements(objParsed)) response.warnings.push(_LinkedElementsInElementsWarning)
-      if(!_parityCheck_BoardsBreakdownIdsEqualsBreakdowns(objParsed)) response.warnings.push(_BoardsBreakdownIdsEqualsBreakdownsWarning)
-      if(!_parityCheck_BoardsBreakdownIdsExistsInBreakdowns(objParsed)) response.warnings.push(_BoardsBreakdownIdsExistsInBreakdownsWarning)
-      if(!_parityCheck_StripboardsHaveCalendar(objParsed)) response.warnings.push(_StripboardsHaveCalendarWarning)
-      if(!_parityCheck_CalendarsHaveStart(objParsed)) response.warnings.push(_CalendarsHaveStartWarning)
+      response.warnings = _breakdownElementIdsInElements(objParsed, response.warnings)
+      response.warnings = _categoryElementIdsInElements(objParsed, response.warnings)
+      response.warnings = _elementsBelongToCategories(objParsed, response.warnings)
+      response.warnings = _linkedElementsInElements(objParsed, response.warnings)
+      response.warnings = _boardsBreakdownIdsEqualsBreakdowns(objParsed, response.warnings)
+      response.warnings = _boardsBreakdownIdsExistsInBreakdowns(objParsed, response.warnings)
+      response.warnings = _stripboardsHaveCalendar(objParsed, response.warnings)
+      response.warnings = _calendarsHaveStart(objParsed, response.warnings)
 
     } else { // obj is not JSON
       response.isValid = false
@@ -75,177 +78,189 @@ function validator(obj) {
 // PARITY CHECKS
 
 // are breakdown.elements ids all in the elments array?
-function _parityCheck_BreakdownElementIdsInElements(obj) {
+function _breakdownElementIdsInElements(obj, warnings) {
   try {
-    var idInArray = false
+    var location = []
+    var hasParity = true
     var elementIds = obj.universalScheduleStandard.elements.map(function(e){return e.id})
-    obj.universalScheduleStandard.breakdowns.forEach(function(breakdown) {
+    for(var b=0;b<obj.universalScheduleStandard.breakdowns.length;b++) {
+      var breakdown = obj.universalScheduleStandard.breakdowns[b]
       if(breakdown.elements.length>0) {
-        idInArray = _compareArrayIds(breakdown.elements, elementIds)
-        if(idInArray===false) {
-          return false
+        var badItems = _compareArrayIds(breakdown.elements, elementIds)
+        if(badItems && badItems.length) {
+          hasParity = false
+          location.concat(badItems)
         }
-      }      
-    })
-    return true
+      } 
+    }
+    if(hasParity) {
+      return warnings
+    } else {
+      warnings.push(_breakdownElementIdsInElementsWarning(location))
+      return warnings
+    }
   } catch(e){
     console.error(e)
   }
 }
 
 // are category.elements ids all in the elments array?
-function _parityCheck_CategoryElementIdsInElements(obj) {
+function _categoryElementIdsInElements(obj, warnings) {
   try {
-    var idInArray = false
+    var location = []
+    var hasParity = true
     var elementIds = obj.universalScheduleStandard.elements.map(function(e){return e.id})
-    obj.universalScheduleStandard.categories.forEach(function(category) {
+    for(var c=0;c<obj.universalScheduleStandard.categories.length;c++) {
+      var category = obj.universalScheduleStandard.categories[c]
       if(category.elements.length>0) {
-        idInArray = _compareArrayIds(category.elements, elementIds)
-        if(idInArray===false) {
-          return false
+        var badItems = _compareArrayIds(category.elements, elementIds)
+        if(badItems && badItems.length) {
+          hasParity = false
+          location.concat(badItems)
         }
       }      
-    })
-    return true
+    }
+    if(hasParity) {
+      return warnings
+    } else {  
+      warnings.push(_categoryElementIdsInElementsWarning(location))
+      return warnings
+    }
   } catch(e){
     console.error(e)
   }
 }
 
 // are there any elements that don't belong to a category?
-function _parityCheck_ElementsBelongToCategories(obj) {
+function _elementsBelongToCategories(obj, warnings) {
   try {
+    var location = []
+    var hasParity = true
     var categories = obj.universalScheduleStandard.categories
-    obj.universalScheduleStandard.elements.forEach(function(element) {
-      var idInArray = false
+    for(var e=0;e<obj.universalScheduleStandard.elements.length;e++) {
+      var element = obj.universalScheduleStandard.elements[e]
       for(var c=0;c<categories.length;c++) {
-        if(categories[c].elements.includes(element.id)) {
-          idInArray = true
-          break
+        if(!categories[c].elements.includes(element.id)) {
+          hasParity = false
+          location.push(element.id)
         }
-      }  
-      if(idInArray===false) {
-        return false
       } 
-    })
-    return true
+    }
+    if(!hasParity) warnings.push(_elementsBelongToCategoriesWarning(location))
+    return warnings
   } catch(e){
     console.error(e)
   }
 }
 
 // do all elements.linkedElements exist in elements?
-function _parityCheck_LinkedElementsInElements(obj) {
+function _linkedElementsInElements(obj, warnings) {
   try {
-    var elements = obj.universalScheduleStandard.elements
-    var elementIds = elements.map(function(e){return e.id})
-    elements.forEach(function(element) {
-      var idInArray = false
+    var location = []
+    var hasParity = true
+    var elementIds = obj.universalScheduleStandard.elements.map(function(e){return e.id})
+    for(var e=0;e<obj.universalScheduleStandard.elements.length;e++) {
+      var element = obj.universalScheduleStandard.elements[e]
       for(var c=0;c<element.linkedElements.length;c++) {
-        if(elementIds.includes(element.linkedElements[c])) {
-          idInArray = true
-          break
+        if(!elementIds.includes(element.linkedElements[c])) {
+          hasParity = false
+          location.push(element.linkedElements[c])
         }
-      }  
-      if(idInArray===false) {
-        return false
-      } 
-    })
-    return true
-  } catch(e){
-    console.error(e)
-  }
-}
-
-// do all stripboards.boards.breakdownIds add up to the number of breakdowns
-function _parityCheck_LinkedElementsInElements(obj) {
-  try {
-    obj.universalScheduleStandard.stripboards.forEach(function(stripboard) {
-      var breakdownsCount = 0
-      stripboard.boards.forEach(function(board) {
-        breakdownsCount = breakdownsCount + board.breakdownIds.length
-      })
-      if(breakdownsCount!==obj.universalScheduleStandard.breakdowns.length) {
-        return false
       }
-    })
-    return true
+    }
+    if(!hasParity) warnings.push(_linkedElementsInElementsWarning(location))
+    return warnings
   } catch(e){
     console.error(e)
   }
 }
 
 // do all stripboard.boards.breakdownIds equal the number of breakdowns?
-function _parityCheck_BoardsBreakdownIdsEqualsBreakdowns(obj) {
+function _boardsBreakdownIdsEqualsBreakdowns(obj, warnings) {
   try {
-    obj.universalScheduleStandard.stripboards.forEach(function(stripboard) {
+    var location = []
+    var hasParity = true
+    for(var s=0;s<obj.universalScheduleStandard.stripboards.length;s++) {
+      var stripboard = obj.universalScheduleStandard.stripboards[s]
       var breakdownCount = 0
       stripboard.boards.forEach(function(board) {
-        breakdownCount = breakdownCount + board.length
+        breakdownCount = breakdownCount + board.breakdownIds.length
       })
       if(obj.universalScheduleStandard.breakdowns.length!==breakdownCount) {
-        return false
+        hasParity = false
+        location.push(stripboard.id)
       }
-    })
-    return true
+    }
+    if(!hasParity) warnings.push(_boardsBreakdownIdsEqualsBreakdownsWarning(location))
+    return warnings
   } catch(e){
     console.error(e)
   }
 }
 
 // do all stripboards.boards.breakdownIds exist in breakdowns array?
-function _parityCheck_BoardsBreakdownIdsExistsInBreakdowns(obj) {
+function _boardsBreakdownIdsExistsInBreakdowns(obj, warnings) {
   try {
-    obj.universalScheduleStandard.stripboards.forEach(function(stripboard) {
-      var idInArray = false
+    var location = []
+    var hasParity = true
+    for(var s=0;s<obj.universalScheduleStandard.stripboards.length;s++) {
+      var stripboard = obj.universalScheduleStandard.stripboards[s]
       stripboard.boards.forEach(function(board) {
         for(var b=0;b<obj.universalScheduleStandard.breakdowns.length;b++) {
-          if(board.breakdownIds.includes(obj.universalScheduleStandard.breakdowns[b])) {
-            idInArray = true
-            break
+          if(!board.breakdownIds.includes(obj.universalScheduleStandard.breakdowns[b])) {
+            hasParity = false
+            location.push(stripboard.id)
           }
         }
-        if(idInArray===false) {
-          return false
-        }
       })
-    })
-    return true
+    }
+    if(!hasParity) warnings.push(_boardsBreakdownIdsExistsInBreakdownsWarning(location))
+    return warnings
   } catch(e){
     console.error(e)
   }
 }
 
 // do all stripboards have a calendar id?
-function _parityCheck_StripboardsHaveCalendar(obj) {
+function _stripboardsHaveCalendar(obj, warnings) {
   try {
-    obj.universalScheduleStandard.stripboards.forEach(function(stripboard) {
+    var location = []
+    var hasParity = true
+    for(var s=0;s<obj.universalScheduleStandard.stripboards.length;s++) {
+      var stripboard = obj.universalScheduleStandard.stripboards[s]
       if(typeof stripboard.calendar !== 'string' && stripboard.calendar.length<1) {
-        return false
+        hasParity = false
+        location.push(stripboard.id)
       }
-    })
-    return true
+    }
+    if(!hasParity) warnings.push(_stripboardsHaveCalendarWarning(location)) 
+    return warnings
   } catch(e){
     console.error(e)
   }
 }
 
 // do all calendars have a start date event?
-function _parityCheck_CalendarsHaveStart(obj) {
+function _calendarsHaveStart(obj, warnings) {
   try {
-    obj.universalScheduleStandard.calendars.forEach(function(calendar) {
+    var location = []
+    var hasParity = true
+    for(var c=0;c<obj.universalScheduleStandard.calendars.length;c++) {
+      var calendar = obj.universalScheduleStandard.calendars[c]
       var idInArray = false
-      for(var c=0;c<calendar.events.length;c++) {
-        if(calendar.events[c].type==='start') {
+      for(var e=0;e<calendar.events.length;e++) {
+        if(calendar.events[e].type==='start') {
           idInArray = true
           break
         }
         if(idInArray===false) {
-          return false
+          hasParity = false
+          location.push(calendar.id)
         }
       }
-    })
-    return true
+    }
+    if(!hasParity) warnings.push(_calendarsHaveStartWarning(location))
+    return warnings
   } catch(e){
     console.error(e)
   }
@@ -253,22 +268,19 @@ function _parityCheck_CalendarsHaveStart(obj) {
 
 // HELPER FUNCTIONS
 
-// is everthing in arr1 in arr2
+// is everthing in arr1 in arr2, return array of items that aren't in arr2
 function _compareArrayIds(arr1, arr2) {
   try {
-    arr1.forEach(function(id1) {
-      var idFound = false
-      for(var e=0;e<arr2.length;e++) {
-        if(arr2[e]===id1) {
-          idFound = true
-          break
+    if(_isArray(arr1) && _isArray(arr2)) {
+      var response = []
+      for(var a=0;a<arr1.length;a++) {
+        if(!arr2.includes(arr1[a])) {
+          response.push(arr1[a])
         }
       }
-      if(idFound===false) {
-        return false
-      }
-    })
-    return true
+      return response
+    }
+    return null
   } catch(e){
     console.error(e)
   }
@@ -276,9 +288,10 @@ function _compareArrayIds(arr1, arr2) {
 
 function _getValueForKey(obj, key) {
   try {
-    return _doesUssObjectHaveKey(obj, key)
-      ? obj.universalScheduleStandard[key]
-      : null
+    if(_doesUssObjectHaveKey(obj, key)) {
+      return obj.universalScheduleStandard[key]
+    }
+    return null
   } catch(e){
     console.error(e)
   }
@@ -286,9 +299,10 @@ function _getValueForKey(obj, key) {
 
 function _getArrayLengthForKey(obj, key) {
   try {
-    return _doesUssObjectHaveKey(obj, key) && _isUssObjectKeyAnArray(obj, key)
-      ? obj.universalScheduleStandard[key].length
-      : null
+    if(_doesUssObjectHaveKey(obj, key) && _isUssObjectKeyAnArray(obj, key)) {
+      return obj.universalScheduleStandard[key].length
+    }
+    return null
   } catch(e){
     console.error(e)
   }
@@ -296,7 +310,16 @@ function _getArrayLengthForKey(obj, key) {
 
 function _doesUssObjectHaveKey(obj, key) {
   try {
-    return typeof obj==='object' && obj.hasOwnProperty('universalScheduleStandard') && obj.universalScheduleStandard.hasOwnProperty(key)
+    if(typeof obj==='object') {
+      var objKeys = Object.keys(obj)
+      if(objKeys && objKeys.length && objKeys.includes('universalScheduleStandard')) {
+        var ussKeys = Object.keys(obj.universalScheduleStandard)
+        if(ussKeys && ussKeys.length && ussKeys.includes(key)) {
+          return true
+        }
+      }
+    }
+    return false
   } catch(e) {
     console.error(e)
   }
@@ -304,10 +327,14 @@ function _doesUssObjectHaveKey(obj, key) {
 
 function _isUssObjectKeyAnArray(obj, key) {
   try {
-    return Array.isArray(obj.universalScheduleStandard[key])
+    return _isArray(obj.universalScheduleStandard[key])
   } catch(e) {
     console.error(e)
   }
+}
+
+function _isArray(arr) {
+  return Array.isArray(arr)
 }
 
 function _isObjectASchedule(obj) {
@@ -350,51 +377,75 @@ var isNotJsonError = {
   message: 'must be a valid JSON object' 
 }
 
-var _BreakdownElementIdsInElementsWarning = {
-  title: 'Breakdown Elements', 
-  message: 'There are element IDs in at least one breakdown object that don\'t exist in the elements array'
+function _breakdownElementIdsInElementsWarning(location) {
+  return {
+    title: 'Breakdown Elements', 
+    location: location,
+    message: 'There are element IDs in at least one breakdown object that don\'t exist in the elements array'
+  }
 }
 
-var _CategoryElementIdsInElementsWarning = {
-  title: 'Category Elements', 
-  message: 'There are element IDs in at least one category object that don\'t exist in the elements array'
+function _categoryElementIdsInElementsWarning(location) {
+  return {
+    title: 'Category Elements',  
+    location: location,
+    message: 'There are element IDs in at least one category object that don\'t exist in the elements array'
+  }
 }
 
-var _ElementsBelongToCategoriesWarning = {
-  title: 'Elements not in Category', 
-  message: 'There is at least one element that does not belong to a category'
+function _elementsBelongToCategoriesWarning(location) {
+  return {
+    title: 'Elements not in Category', 
+    location: location,
+    message: 'There is at least one element that does not belong to a category'
+  }
 }
 
-var _LinkedElementsInElementsWarning = {
-  title: 'Linked Elements not in Elements', 
-  message: 'There is at least one linked element that does not appear in the elements array'
+function _linkedElementsInElementsWarning(location) {
+  return {
+    title: 'Linked Elements not in Elements', 
+    location: location,
+    message: 'There is at least one linked element that does not appear in the elements array'
+  }
 }
 
-var _BoardsBreakdownIdsEqualsBreakdownsWarning = {
-  title: 'Boards does not equal Breakdowns', 
-  message: 'The number of breakdownIds in the boards does not equal the number of objects in the breakdowns array'
+function _boardsBreakdownIdsEqualsBreakdownsWarning(location) {
+  return {
+    title: 'Boards does not equal Breakdowns', 
+    location: location,
+    message: 'The number of breakdownIds in the boards does not equal the number of objects in the breakdowns array'
+  }
 }
 
-var _BoardsBreakdownIdsExistsInBreakdownsWarning = {
-  title: 'Boards breakdownIds not in Breakdowns', 
-  message: 'There are breakdownIds in the boards that are not in the breakdowns array'
+function _boardsBreakdownIdsExistsInBreakdownsWarning(location) {
+  return {
+    title: 'Boards breakdownIds not in Breakdowns', 
+    location: location,
+    message: 'There are breakdownIds in the boards that are not in the breakdowns array'
+  }
 }
 
-var _StripboardsHaveCalendarWarning = {
-  title: 'Stripboard missing Calendar', 
-  message: 'There is a stripboard this is missing its calendarId'
+function _stripboardsHaveCalendarWarning(location) {
+  return {
+    title: 'Stripboard missing Calendar', 
+    location: location,
+    message: 'There is a stripboard that is missing its calendarId'
+  }
 }
 
-var _CalendarsHaveStartWarning = {
-  title: 'Calendar missing start date', 
-  message: 'There is a calendar this is missing a start date event'
+function _calendarsHaveStartWarning(location) {
+  return {
+    title: 'Calendar missing start date', 
+    location: location,
+    message: 'There is a calendar that is missing a start date event'
+  }
 }
 
 
 
 
 
-const obj = {
+var obj = {
   "universalScheduleStandard": {
     "id": "2022-06-11T00:12:02.000Z",
     "author": "Michael R. Williams",
@@ -419,7 +470,7 @@ const obj = {
         "comments":  null,
         "created": "2022-06-11T00:12:02.000Z",
         "description": "It's A Wonderful Life Production Schedule",
-        "elements": [],
+        "elements": ["foo"],
         "pages":  null,
         "scene":  null,
         "scriptPage":  null,
