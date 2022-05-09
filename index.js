@@ -89,14 +89,14 @@ function _breakdownElementIdsInElements(obj, warnings) {
         var badItems = _compareArrayIds(breakdown.elements, elementIds)
         if(badItems && badItems.length) {
           hasParity = false
-          location.concat(badItems)
+          location = location.concat(badItems)
         }
       } 
     }
     if(hasParity) {
       return warnings
     } else {
-      warnings.push(_breakdownElementIdsInElementsWarning(location))
+      warnings.push(_breakdownElementIdsInElementsWarning(_uniq(location)))
       return warnings
     }
   } catch(e){
@@ -116,14 +116,14 @@ function _categoryElementIdsInElements(obj, warnings) {
         var badItems = _compareArrayIds(category.elements, elementIds)
         if(badItems && badItems.length) {
           hasParity = false
-          location.concat(badItems)
+          location = location.concat(badItems)
         }
       }      
     }
     if(hasParity) {
       return warnings
     } else {  
-      warnings.push(_categoryElementIdsInElementsWarning(location))
+      warnings.push(_categoryElementIdsInElementsWarning(_uniq(location)))
       return warnings
     }
   } catch(e){
@@ -139,14 +139,19 @@ function _elementsBelongToCategories(obj, warnings) {
     var categories = obj.universalScheduleStandard.categories
     for(var e=0;e<obj.universalScheduleStandard.elements.length;e++) {
       var element = obj.universalScheduleStandard.elements[e]
+      var isInArray = false
       for(var c=0;c<categories.length;c++) {
-        if(!categories[c].elements.includes(element.id)) {
-          hasParity = false
-          location.push(element.id)
+        if(categories[c].elements.includes(element.id)) {
+          isInArray = true
+          continue
         }
       } 
+      if(!isInArray) {
+        hasParity = false
+        location.push(element.id)
+      }
     }
-    if(!hasParity) warnings.push(_elementsBelongToCategoriesWarning(location))
+    if(!hasParity) warnings.push(_elementsBelongToCategoriesWarning(_uniq(location)))
     return warnings
   } catch(e){
     console.error(e)
@@ -168,7 +173,7 @@ function _linkedElementsInElements(obj, warnings) {
         }
       }
     }
-    if(!hasParity) warnings.push(_linkedElementsInElementsWarning(location))
+    if(!hasParity) warnings.push(_linkedElementsInElementsWarning(_uniq(location)))
     return warnings
   } catch(e){
     console.error(e)
@@ -191,7 +196,7 @@ function _boardsBreakdownIdsEqualsBreakdowns(obj, warnings) {
         location.push(stripboard.id)
       }
     }
-    if(!hasParity) warnings.push(_boardsBreakdownIdsEqualsBreakdownsWarning(location))
+    if(!hasParity) warnings.push(_boardsBreakdownIdsEqualsBreakdownsWarning(_uniq(location)))
     return warnings
   } catch(e){
     console.error(e)
@@ -203,18 +208,26 @@ function _boardsBreakdownIdsExistsInBreakdowns(obj, warnings) {
   try {
     var location = []
     var hasParity = true
+    var breakdownIds = obj.universalScheduleStandard.breakdowns.map(function(e){return e.id})
     for(var s=0;s<obj.universalScheduleStandard.stripboards.length;s++) {
       var stripboard = obj.universalScheduleStandard.stripboards[s]
       stripboard.boards.forEach(function(board) {
-        for(var b=0;b<obj.universalScheduleStandard.breakdowns.length;b++) {
-          if(!board.breakdownIds.includes(obj.universalScheduleStandard.breakdowns[b])) {
+        if(board.breakdownIds.length>0) {
+          var failed = false
+          for(var b=0;b<board.breakdownIds.length;b++) {
+            if(!breakdownIds.includes(board.breakdownIds[b])) {
+              failed = true
+              continue
+            }
+          } 
+          if(failed) {
             hasParity = false
-            location.push(stripboard.id)
+            location.push(board.id)
           }
         }
       })
     }
-    if(!hasParity) warnings.push(_boardsBreakdownIdsExistsInBreakdownsWarning(location))
+    if(!hasParity) warnings.push(_boardsBreakdownIdsExistsInBreakdownsWarning(_uniq(location)))
     return warnings
   } catch(e){
     console.error(e)
@@ -233,7 +246,7 @@ function _stripboardsHaveCalendar(obj, warnings) {
         location.push(stripboard.id)
       }
     }
-    if(!hasParity) warnings.push(_stripboardsHaveCalendarWarning(location)) 
+    if(!hasParity) warnings.push(_stripboardsHaveCalendarWarning(_uniq(location))) 
     return warnings
   } catch(e){
     console.error(e)
@@ -259,7 +272,7 @@ function _calendarsHaveStart(obj, warnings) {
         }
       }
     }
-    if(!hasParity) warnings.push(_calendarsHaveStartWarning(location))
+    if(!hasParity) warnings.push(_calendarsHaveStartWarning(_uniq(location)))
     return warnings
   } catch(e){
     console.error(e)
@@ -335,6 +348,12 @@ function _isUssObjectKeyAnArray(obj, key) {
 
 function _isArray(arr) {
   return Array.isArray(arr)
+}
+
+function _uniq(arr) {
+  return arr.filter(function (value, index, self) {
+    return self.indexOf(value) === index;
+  })
 }
 
 function _isObjectASchedule(obj) {
@@ -470,7 +489,7 @@ var obj = {
         "comments":  null,
         "created": "2022-06-11T00:12:02.000Z",
         "description": "It's A Wonderful Life Production Schedule",
-        "elements": ["foo"],
+        "elements": [],
         "pages":  null,
         "scene":  null,
         "scriptPage":  null,
