@@ -8,8 +8,7 @@
     "ajv": "^8.11.0"
   },
   "scripts": {
-    "start": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node test/test"
   },
   "repository": {
     "type": "git",
@@ -25,5 +24,5 @@
   "bugs": {
     "url": "https://github.com/UniversalScheduleStandard/uss-validator/issues"
   },
-  "homepage": "https://github.com/UniversalScheduleStandard/uss-validator#readme"
+  "homepage": "https://universalschedulestandard.org"
 }
