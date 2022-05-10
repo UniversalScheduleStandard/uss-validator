@@ -1,16 +1,26 @@
 var isObject = require('./isObject')
 
 // isJson
-// takes an object or string and returns true if it is a JSON object
-module.exports = function(item) {
+// takes an object or string and returns based on the return type - boolean, string or object
+module.exports = function(item, returnType) {
   if(item!==undefined && item!==null) {
-    var jsonString = typeof item !== 'string' ? JSON.stringify(item) : item
     try {
-      var jsonParsed = JSON.parse(jsonString)
+      var jsonString = item
+      if(typeof jsonString !== 'string') {
+        jsonString = JSON.stringify(item)
+      }
+      var jsonObject = JSON.parse(jsonString)
     } catch(e) {
-      return false
+      if(returnType==='boolean') {
+        return false
+      }
+      return null      
     }
-    return isObject(jsonParsed)
+    switch(returnType) {
+      case 'string': return jsonString
+      case 'object': return jsonObject
+      default: return isObject(jsonObject) // boolean
+    }
   }
   return false  
 }
