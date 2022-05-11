@@ -4,8 +4,6 @@
 ![GitHub closed issues](https://img.shields.io/github/issues-closed/universalschedulestandard/uss-validator)
 ![GitHub pull requests](https://img.shields.io/github/issues-pr/universalschedulestandard/uss-validator?color=yellow)
 ![GitHub closed pull requests](https://img.shields.io/github/issues-pr-closed/universalschedulestandard/uss-validator?color=yellow)
-![GitHub Repo stars](https://img.shields.io/github/stars/universalschedulestandard/uss-validator?style=social)
-![GitHub watchers](https://img.shields.io/github/watchers/universalschedulestandard/uss-validator?style=social)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Provides validation for [Universal Schedule Standard](https://github.com/UniversalScheduleStandard/UniversalScheduleStandard) objects. 
