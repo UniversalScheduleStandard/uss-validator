@@ -10,6 +10,10 @@
   "scripts": {
     "test": "node test/test"
   },
+  "engines": {
+    "node": "*",
+    "npm": "*"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/UniversalScheduleStandard/uss-validator.git"
