@@ -30,7 +30,15 @@ const response = validator(universalScheduleStandardObject)
 
 console.log(response)
 
-/* response value
+```
+
+It will return a [response object](#response-object). 
+
+## Response Object
+
+The response object has four primary key values: `isValid`, `errors`, `warnings` and `info`. 
+
+```js
 {  
   isValid: true,
   errors: [],
@@ -53,14 +61,7 @@ console.log(response)
     calendars: 1,
   }
 }
-*/
 ```
-
-It will return a [response object](#response-object). 
-
-## Response Object
-
-The response object has four primary key values: `isValid`, `errors`, `warnings` and `info`. 
 
 The `isValid` value is a boolean that denotes whether the USS object is considered to be a valid constrution. 
 
