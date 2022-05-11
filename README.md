@@ -100,5 +100,3 @@ The uss-validator will return errors or warnings in the following format:
 ```
 
 Errors and warnings use the same object construction. 
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
