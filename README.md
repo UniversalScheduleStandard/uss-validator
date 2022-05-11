@@ -45,7 +45,7 @@ The response object has four primary key values: `isValid`, `errors`, `warnings`
   warnings: [
     { 
       title: 'Stripboard missing Calendar', 
-      location: '5d01230c987033001725c908',
+      location: ['5d01230c987033001725c908'],
       message: 'There is a stripboard that is missing its calendarId'
     }
   ],
@@ -53,12 +53,12 @@ The response object has four primary key values: `isValid`, `errors`, `warnings`
     isSchedule: true,
     name: 'Small Sample Schedule',
     source: 'Think Crew',
-    ussVersion: '1.0.0' 
+    ussVersion: '1.0.0',
     breakdowns: 3,
     categories: 5,
     elements: 6,
     stripboards: 2,
-    calendars: 1,
+    calendars: 1
   }
 }
 ```
@@ -71,7 +71,7 @@ The `info` object contains various pieces of information about the USS object:
 
 | Key        | Value |
 | :---       | :--- |
-| isSchedule | boolean \| true if the USS object contains both schedule and calendar info |
+| isSchedule | boolean \| true if the USS object contains both stripboard and calendar data |
 | name       | string \| the name of the schedule   |
 | source     | string \| the originating site or app   |
 | ussVersion | string \| the version of the standard this file is using   |
