@@ -1,4 +1,12 @@
-# Universal Schedule Standard Validator 
+# **Universal Schedule Standard Validator**
+
+![GitHub issues](https://img.shields.io/github/issues/universalschedulestandard/uss-validator)
+![GitHub closed issues](https://img.shields.io/github/issues-closed/universalschedulestandard/uss-validator)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/universalschedulestandard/uss-validator?color=yellow)
+![GitHub closed pull requests](https://img.shields.io/github/issues-pr-closed/universalschedulestandard/uss-validator?color=yellow)
+![GitHub Repo stars](https://img.shields.io/github/stars/universalschedulestandard/uss-validator?style=social)
+![GitHub watchers](https://img.shields.io/github/watchers/universalschedulestandard/uss-validator?style=social)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Provides validation for [Universal Schedule Standard](https://github.com/UniversalScheduleStandard/UniversalScheduleStandard) objects. 
 
@@ -65,7 +73,7 @@ The response object has four primary key values: `isValid`, `errors`, `warnings`
 
 The `isValid` value is a boolean that denotes whether the USS object is considered to be a valid constrution. 
 
-The `errors` and `warnings` values are arrays that will contain [error objects](#error-objects) that describe any issues with the USS object. Errors are considered fatal and always result in `isValid` returning false. Warnings are merely related to the user's data potentially being malformed, and are not fatal. 
+The `errors` and `warnings` values are arrays that may contain [error objects](#error-objects) that describe any issues with the USS object. Errors are considered fatal and always result in `isValid` returning false. Warnings are merely related to the user's data potentially being malformed, and are not fatal. 
 
 The `info` object contains various pieces of information about the USS object:
 
@@ -94,3 +102,5 @@ The uss-validator will return errors or warnings in the following format:
 ```
 
 Errors and warnings use the same object construction. 
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
