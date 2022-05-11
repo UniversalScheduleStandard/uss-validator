@@ -3,3 +3,74 @@
 Provides validation for [Universal Schedule Standard](https://github.com/UniversalScheduleStandard/UniversalScheduleStandard) objects. 
 
 This project is currently a work in progress and is not ready for use in production. 
+
+## Install
+
+Navigate to your project folder and enter the following in terminal:
+
+```
+npm i uss-validator
+```
+
+## How to Use
+
+```js
+import validator from 'uss-validator'
+
+const response = validator(universalScheduleStandarObject)
+
+console.log(response)
+
+// {  
+//    isValid: true,
+//    errors: [],
+//    warnings: [],
+//    info: { 
+//      isSchedule: true,
+//      name: 'Small Sample Schedule',
+//      source: 'Think Crew',
+//      ussVersion: '0.9.0' 
+//      breakdowns: 3,
+//      categories: 5,
+//      elements: 6,
+//      stripboards: 2,
+//      calendars: 1,
+//    }
+// }
+```
+
+## Response Object
+
+The response object has four primary key values: `isValid`, `errors`, `warnings` and `info`. 
+
+The `isValid` value is a boolean that denotes whether the USS object is considered to be a valid constrution. 
+
+The `errors` and `warnings` values are arrays that will contain [error objects](#error-objects) that describe any issues with the USS object.
+
+The `info` object contains various pieces of information about the USS object:
+
+| Key        | Value |
+| :---       | :---: |
+| isSchedule | boolean \| true if the USS object contains both schedule and calendar info |
+| name       | string \| the name of the schedule   |
+| source     | string \| the originating site or app   |
+| ussVersion | string \| the version of the standard this file is using   |
+| breakdowns | number \| the number of breakdowns in the object |
+| categories | number \| the number of categories in the object |
+| elements   | number \| the number of elements in the object |
+| stripboards| number \| the number of stripboards in the object |
+| calendars  | number \| the number of calendars in the object |
+
+### Error Objects
+
+The uss-validator will return errors or warnings in the following format:
+
+```
+{
+  title: string | the title of the error or warning,
+  message: string | the full error or warning message,
+  location: array | an array of text strings that will give clues as to where the error occurred in the file
+}
+```
+
+Errors and warnings use the same object construction. 
