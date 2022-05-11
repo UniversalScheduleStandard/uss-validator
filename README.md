@@ -18,14 +18,18 @@ The uss-validator will be added into your project and your package.json file.
 
 ## How to Use
 
-You can call the validator with a Universal Schedule Standard Object as the only argument. It will return a response object. 
+You can call the validator with a Universal Schedule Standard Object as the only argument. The validator accepts Universal Schedule Standard objects as either JSON strings or JSON objects.
+
+It will return a [response object](#response-object), see below. 
 
 ```js
 import validator from 'uss-validator'
 
-// Get universalScheduleStandardObject file
-// The validator accepts either JSON strings or objects
+// ...
+// then get get a .uss file or object via upload or from a saved file
+// ...
 
+const universalScheduleStandardObject = 
 const response = validator(universalScheduleStandardObject)
 
 console.log(response)
