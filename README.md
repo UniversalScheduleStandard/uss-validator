@@ -50,7 +50,7 @@ The `errors` and `warnings` values are arrays that will contain [error objects](
 The `info` object contains various pieces of information about the USS object:
 
 | Key        | Value |
-| :---       | :---: |
+| :---       | :--- |
 | isSchedule | boolean \| true if the USS object contains both schedule and calendar info |
 | name       | string \| the name of the schedule   |
 | source     | string \| the originating site or app   |
