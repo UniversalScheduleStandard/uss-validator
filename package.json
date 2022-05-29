@@ -1,6 +1,6 @@
 {
   "name": "uss-validator",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "Michael R. Williams",
   "description": "Provides validation for Universal Schedule Standard objects",
   "main": "index.js",

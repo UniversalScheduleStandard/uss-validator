@@ -9,19 +9,11 @@ module.exports = {
     })
   },
   
-  categoryElementIdsInElements: function(location) {
+  elementsHaveCategory: function(location) {
     return error.createError({
-      title: 'Category Elements',  
+      title: 'Element missing Category', 
       location: location,
-      message: 'There are element IDs in at least one category object that don\'t exist in the elements array'
-    })
-  },
-  
-  elementsBelongToCategories: function(location) {
-    return error.createError({
-      title: 'Elements not in Category', 
-      location: location,
-      message: 'There is at least one element that does not belong to a category'
+      message: 'There is at least one element that is missing a category Id'
     })
   },
   

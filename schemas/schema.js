@@ -20,7 +20,7 @@ module.exports = {
         scriptDate: {type: 'string', nullable: true},
         season: {type: 'string', nullable: true},
         source: {type: 'string'},
-        version: {type: 'string'},
+        ussVersion: {type: 'string'},
         breakdowns: {
           type: 'array', 
           minItems: 1,
@@ -35,10 +35,10 @@ module.exports = {
               pages: {type: 'number', minimum: 0, multipleOf: .125, nullable: true},
               scene: {type: 'string', nullable: true},
               scriptPage: {type: 'string', nullable: true},
-              time: {type: 'number', minimum: 0, nullable: true},
+              duration: {type: 'number', minimum: 0, nullable: true},
               type: {type: 'string', enum: ['scene','day','banner']}
             },
-            required: ['id', 'comments', 'created', 'description', 'elements', 'pages', 'scene', 'scriptPage', 'time', 'type'],
+            required: ['id', 'comments', 'created', 'description', 'elements', 'pages', 'scene', 'scriptPage', 'duration', 'type'],
             additionalProperties: false
           }
         },
@@ -50,11 +50,10 @@ module.exports = {
             properties: {
               id: {type: 'string'},
               created: {type: 'string'},
-              elements: {type: 'array', items: {type: 'string'}},
               name: {type: 'string'},
               ucid: {type: 'number', minimum: 0},
             },
-            required: ['id', 'created', 'elements', 'name', 'ucid'],
+            required: ['id', 'created', 'name', 'ucid'],
             additionalProperties: false
           }
         },
@@ -65,6 +64,7 @@ module.exports = {
             type: 'object',
             properties: {
               id: {type: 'string'},
+              category: {type: 'string'},
               created: {type: 'string'},
               daysOff: {type: 'array', maxItems: 7, uniqueItems: true, items: {type: 'number', minimum: 0, maximum: 6}},
               dropDayCount: {type: 'number'},
@@ -91,7 +91,7 @@ module.exports = {
               linkedElements: {type: 'array', items: {type: 'string'}, nullable: true},
               name: {type: 'string'},
             },
-            required: ['id', 'created', 'daysOff', 'dropDayCount', 'elementId', 'events', 'isDood', 'isDrop', 'isHold', 'isIdLock', 'linkedElements', 'name'],
+            required: ['id', 'category', 'created', 'daysOff', 'dropDayCount', 'elementId', 'events', 'isDood', 'isDrop', 'isHold', 'isIdLock', 'linkedElements', 'name'],
             additionalProperties: false
           }
         },
@@ -152,7 +152,7 @@ module.exports = {
           }
         }
       },
-      required: ['id','author','company','created','episode','episodeName','description','name','project','schedColor','schedDate','scriptColor','scriptDate','season','source','version','breakdowns','categories','elements'],
+      required: ['id','author','company','created','episode','episodeName','description','name','project','schedColor','schedDate','scriptColor','scriptDate','season','source','ussVersion','breakdowns','categories','elements'],
       additionalProperties: false
     }
   },
