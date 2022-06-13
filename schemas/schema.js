@@ -28,6 +28,7 @@ module.exports = {
             type: 'object',
             properties: {
               id: {type: 'string'},
+              bannerText: {type: 'string', nullable: true},
               comments: {type: 'string', nullable: true},
               created: {type: 'string'},
               description: {type: 'string', nullable: true},
@@ -38,7 +39,7 @@ module.exports = {
               duration: {type: 'number', minimum: 0, nullable: true},
               type: {type: 'string', enum: ['scene','day','banner']}
             },
-            required: ['id', 'comments', 'created', 'description', 'elements', 'pages', 'scene', 'scriptPage', 'duration', 'type'],
+            required: ['id', 'bannerText', 'comments', 'created', 'description', 'elements', 'pages', 'scene', 'scriptPage', 'duration', 'type'],
             additionalProperties: false
           }
         },
@@ -109,7 +110,7 @@ module.exports = {
                   properties: {
                     id: {type: 'string'},
                     name: {type: 'string'},
-                    breakdownIds:{type: 'array', items: {type: 'string'}}
+                    breakdownIds:{type: 'array', items: {oneOf: [{type: "array"}, {type: "string"}]}}
                   },
                   required: ['id', 'name', 'breakdownIds'],
                   additionalProperties: false

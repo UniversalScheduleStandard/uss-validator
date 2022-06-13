@@ -14,12 +14,23 @@ module.exports = function(obj, warnings) {
       stripboard.boards.forEach(function(board) {
         if(board.breakdownIds.length>0) {
           var failed = false
-          for(var b=0;b<board.breakdownIds.length;b++) {
-            if(!breakdownIds.includes(board.breakdownIds[b])) {
-              failed = true
-              continue
-            }
-          } 
+          if(Array.isArray(board.breakdownIds[0])) {
+            board.breakdownIds.forEach(function(dayArray) {
+              for(var b=0;b<dayArray.length;b++) {
+                if(!breakdownIds.includes(dayArray[b])) {
+                  failed = true
+                  continue
+                }
+              } 
+            })
+          } else {
+            for(var b=0;b<board.breakdownIds.length;b++) {
+              if(!breakdownIds.includes(board.breakdownIds[b])) {
+                failed = true
+                continue
+              }
+            } 
+          }
           if(failed) {
             hasParity = false
             location.push(board.id)

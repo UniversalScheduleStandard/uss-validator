@@ -69,7 +69,7 @@ The response object has four primary key values: `isValid`, `errors`, `warnings`
 }
 ```
 
-The `isValid` value is a boolean that denotes whether the USS object is considered to be a valid constrution. 
+The `isValid` value is a boolean that denotes whether the USS object is considered to be a valid construction. 
 
 The `errors` and `warnings` values are arrays that may contain [error objects](#error-objects) that describe any issues with the USS object. Errors are considered fatal and always result in `isValid` returning false. Warnings are merely related to the user's data potentially being malformed, and are not fatal. 
 

@@ -12,7 +12,15 @@ module.exports = function(obj, warnings) {
       var stripboard = obj.universalScheduleStandard.stripboards[s]
       var breakdownCount = 0
       stripboard.boards.forEach(function(board) {
-        breakdownCount = breakdownCount + board.breakdownIds.length
+        if(board.breakdownIds.length>0) {
+          if(Array.isArray(board.breakdownIds[0])) {
+            board.breakdownIds.forEach(function(dayArray) {
+              breakdownCount += dayArray.length
+            })
+          } else {
+            breakdownCount += board.breakdownIds.length
+          }
+        }
       })
       if(obj.universalScheduleStandard.breakdowns.length!==breakdownCount) {
         hasParity = false

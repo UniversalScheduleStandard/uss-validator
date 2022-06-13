@@ -33,7 +33,7 @@ test(doesObjectHaveKey(res, 'errors'),'the object has key \'errors\'')
 test(isArray(res.errors),'the errors value is an array')
 test(doesObjectHaveKey(res, 'warnings'),'the object has key \'warnings\'')
 test(isArray(res.warnings),'the errors value is an array')
-// console.log(res)
+console.log(res)
 
 function test(query, message) {
   if(query) {
