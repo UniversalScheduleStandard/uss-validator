@@ -6,9 +6,7 @@
 ![GitHub closed pull requests](https://img.shields.io/github/issues-pr-closed/universalschedulestandard/uss-validator?color=yellow)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Provides validation for [Universal Schedule Standard](https://github.com/UniversalScheduleStandard/UniversalScheduleStandard) objects. 
-
-**This project is currently a work in progress and is not ready for use in production.**
+Provides validation for [Universal Schedule Standard](https://github.com/UniversalScheduleStandard/UniversalScheduleStandard) objects.
 
 This package may be used either on the frontend or backend. Is is written in ECMA Script 5, so it is widely compatible with any Javascript project. 
 
