@@ -1,7 +1,7 @@
 var isArray = require('./isArray')
 
 // compareArrayIds
-// is everthing in arr1 in arr2, return array of items that aren't in arr2
+// is everything in arr1 in arr2, return array of items that aren't in arr2
 
 module.exports = function(arr1, arr2) {
   try {

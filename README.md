@@ -8,7 +8,7 @@
 
 Provides validation for [Universal Schedule Standard](https://github.com/UniversalScheduleStandard/UniversalScheduleStandard) objects.
 
-This package may be used either on the frontend or backend. Is is written in ECMA Script 5, so it is widely compatible with any Javascript project. 
+This package may be used either on the frontend or backend. Is is written in ECMA Script 5, so it is widely compatible with any Javascript project.
 
 ## Install
 
@@ -18,7 +18,7 @@ Navigate to your project folder and enter the following in terminal:
 npm i uss-validator
 ```
 
-The uss-validator will be added into your project and your package.json file. 
+The uss-validator will be added into your project and your package.json file.
 
 ## How to Use
 
@@ -36,11 +36,11 @@ console.log(response)
 
 ```
 
-It will return a [response object](#response-object). 
+It will return a [response object](#response-object).
 
 ## Response Object
 
-The response object has four primary key values: `isValid`, `errors`, `warnings` and `info`. 
+The response object has four primary key values: `isValid`, `errors`, `warnings` and `info`.
 
 ```js
 {  
@@ -67,9 +67,9 @@ The response object has four primary key values: `isValid`, `errors`, `warnings`
 }
 ```
 
-The `isValid` value is a boolean that denotes whether the USS object is considered to be a valid construction. 
+The `isValid` value is a boolean that denotes whether the USS object is considered to be a valid construction.
 
-The `errors` and `warnings` values are arrays that may contain [error objects](#error-objects) that describe any issues with the USS object. Errors are considered fatal and always result in `isValid` returning false. Warnings are merely related to the user's data potentially being malformed, and are not fatal. 
+The `errors` and `warnings` values are arrays that may contain [error objects](#error-objects) that describe any issues with the USS object. Errors are considered fatal and always result in `isValid` returning false. Warnings are merely related to the user's data potentially being malformed, and are not fatal.
 
 The `info` object contains various pieces of information about the USS object:
 
@@ -97,4 +97,4 @@ The uss-validator will return errors or warnings in the following format:
 }
 ```
 
-Errors and warnings use the same object construction. 
+Errors and warnings use the same object construction.

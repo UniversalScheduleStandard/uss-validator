@@ -3,7 +3,7 @@ var warning = require('../utils/warnings')
 var uniq = require('../utils/uniq')
 
 // breakdownElementIdsInElements
-// are breakdown.elements ids all in the elments array?
+// are breakdown.elements ids all in the elements array?
 
 module.exports = function(obj, warnings) {
   try {
