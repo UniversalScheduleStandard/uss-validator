@@ -2,8 +2,12 @@ var compareArrayIds = require('../utils/compareArrayIds')
 var warning = require('../utils/warnings')
 var uniq = require('../utils/uniq')
 
-// breakdownElementIdsInElements
-// are breakdown.elements ids all in the elments array?
+/**
+ * Checks if the breakdown.elements ids are all present in the elements array.
+ * @param {Object} obj - The object containing the universal schedule standard.
+ * @param {Array} warnings - The array to store any warnings.
+ * @returns {Array} - The updated warnings array.
+ */
 
 module.exports = function(obj, warnings) {
   try {

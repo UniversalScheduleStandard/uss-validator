@@ -1,8 +1,13 @@
 var warning = require('../utils/warnings')
 var uniq = require('../utils/uniq')
 
-// boardsBreakdownIdsExistsInBreakdowns
-// do all stripboards.boards.breakdownIds exist in breakdowns array?
+/**
+ * Checks if all stripboards.boards.breakdownIds exist in the breakdowns array.
+ *
+ * @param {Object} obj - The input object containing universalScheduleStandard and breakdowns.
+ * @param {Array} warnings - The array to store warning messages.
+ * @returns {Array} - The updated warnings array.
+ */
 
 module.exports = function(obj, warnings) {
   try {

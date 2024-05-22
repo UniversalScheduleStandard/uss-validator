@@ -1,8 +1,13 @@
 var warning = require('../utils/warnings')
 var uniq = require('../utils/uniq')
 
-// linkedElementsInElements
-// do all elements.linkedElements exist in elements?
+/**
+ * Checks if all elements.linkedElements exist in elements.
+ * @module linkedElementsInElements
+ * @param {Object} obj - The object containing the elements and linkedElements.
+ * @param {Array} warnings - The array to store any warnings.
+ * @returns {Array} - The updated warnings array.
+ */
 
 module.exports = function(obj, warnings) {
   try {

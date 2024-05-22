@@ -1,8 +1,13 @@
 var warning = require('../utils/warnings')
 var uniq = require('../utils/uniq')
 
-// calendarsHaveStart
-// do all calendars have a start date event?
+/**
+ * Checks if all calendars have a start date event.
+ * @module calendarsHaveStart
+ * @param {Object} obj - The object containing the calendars.
+ * @param {Array} warnings - The array to store the warning messages.
+ * @returns {Array} - The updated array of warning messages.
+ */
 
 module.exports = function(obj, warnings) {
   try {

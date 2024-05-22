@@ -1,8 +1,13 @@
 var warning = require('../utils/warnings')
 var uniq = require('../utils/uniq')
 
-// stripboardsHaveCalendar
-// do all stripboards have a calendar id?
+/**
+ * Checks if all stripboards have a calendar id.
+ * @module stripboardsHaveCalendar
+ * @param {Object} obj - The object containing the stripboards.
+ * @param {Array} warnings - The array to store any warnings.
+ * @returns {Array} - The array of warnings.
+ */
 
 module.exports = function(obj, warnings) {
   try {

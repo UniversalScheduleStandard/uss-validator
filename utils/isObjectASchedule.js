@@ -2,8 +2,12 @@ var doesUssObjectHaveKey = require('./doesUssObjectHaveKey')
 var isUssObjectKeyAnArray = require('./isUssObjectKeyAnArray')
 var getArrayLengthForKey = require('./getArrayLengthForKey')
 
-// isObjectASchedule
-// takes uss object and returns true if it has stripboards and calendars
+/**
+ * Checks if the given object is a valid schedule.
+ *
+ * @param {Object} obj - The uss object to be checked.
+ * @returns {boolean} - Returns true if the object has stripboards and calendars, false otherwise.
+ */
 
 module.exports = function(obj) {
   try {

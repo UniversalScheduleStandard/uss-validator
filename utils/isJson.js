@@ -1,7 +1,12 @@
 var isObject = require('./isObject')
 
-// isJson
-// takes an object or string and returns based on the return type - boolean, string or object
+/**
+ * Checks if the given item is a valid JSON string or object.
+ * @param {string|object} item - The item to be checked.
+ * @param {string} returnType - The desired return type. Can be 'boolean', 'string', or 'object'.
+ * @returns {boolean|string|object|null} - The result based on the return type. Returns false if the item is not a valid JSON string or object.
+ */
+
 module.exports = function(item, returnType) {
   if(item!==undefined && item!==null) {
     try {

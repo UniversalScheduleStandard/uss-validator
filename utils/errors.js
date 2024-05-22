@@ -1,8 +1,17 @@
 var doesObjectHaveKey = require('./doesObjectHaveKey')
 var isArray = require('./isArray')
 
-// createError
-// takes an object and returns a USS Validator error object
+/**
+ * Takes an object and returns a USS Validator error object.
+ *
+ * @typedef {Object} ErrorObject
+ * @property {string} title - The title of the error.
+ * @property {Array} location - The location of the error.
+ * @property {string} message - The error message.
+ * 
+ * @param {ErrorObject} obj - The object containing the error properties.
+ * @returns {Object} - The error object with the specified properties.
+ */
 function createError(obj) {
   try {
     var title = 'Unknown Error'
@@ -21,8 +30,12 @@ function createError(obj) {
   } 
 }
 
-// parseAjvErrors
-// takes an arr of Ajv error objects and returns USS Validator error objects
+/**
+ * Parses an array of Ajv errors and returns an array of error objects.
+ * 
+ * @param {Array} arr - The array of Ajv errors to be parsed.
+ * @returns {Array} - An array of error objects.
+ */
 function parseAjvErrors(arr) {
   try {
     if(arr===null) return []

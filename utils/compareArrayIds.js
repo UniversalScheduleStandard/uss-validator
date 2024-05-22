@@ -1,7 +1,12 @@
 var isArray = require('./isArray')
 
-// compareArrayIds
-// is everthing in arr1 in arr2, return array of items that aren't in arr2
+/**
+ * Compare the elements of two arrays and return an array of items that are not present in the second array.
+ *
+ * @param {Array} arr1 - The first array to compare.
+ * @param {Array} arr2 - The second array to compare.
+ * @returns {Array|null} - An array of items that are in `arr1` but not in `arr2`, or `null` if either `arr1` or `arr2` is not an array.
+ */
 
 module.exports = function(arr1, arr2) {
   try {

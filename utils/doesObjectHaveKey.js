@@ -1,7 +1,12 @@
 var isObject = require('./isObject')
 
-// doesObjectHaveKey
-// takes object and string and returns true if object.string exists
+/**
+ * Checks if an object has a specific key.
+ *
+ * @param {Object} obj - The object to check.
+ * @param {string} key - The key to check for.
+ * @returns {boolean} - Returns true if the object has the specified key, otherwise false.
+ */
 
 module.exports = function(obj, key) {
   if(isObject(obj)) {

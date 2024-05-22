@@ -4,7 +4,7 @@ var doesObjectHaveKey = require('../utils/doesObjectHaveKey')
 var isArray = require('../utils/isArray')
 var isObject = require('../utils/isObject')
 
-var jsonData = JSON.parse(fs.readFileSync('./test/small_sample_schedule.uss', 'utf-8'))
+var jsonData = JSON.parse(fs.readFileSync('./small_sample_schedule.uss', 'utf-8'))
 
 var res = validator(jsonData)
 

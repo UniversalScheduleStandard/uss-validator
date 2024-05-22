@@ -1,11 +1,11 @@
 {
   "name": "uss-validator",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "author": "Universal Schedule Standard",
-  "description": "Provides validation for Universal Schedule Standard objects",
+  "description": "Provides validation for Universal Schedule Standard (.uss) objects",
   "main": "index.js",
-  "dependencies": {
-    "ajv": "^8.11.0"
+  "peerDependencies": {
+    "ajv": "^8.13.0"
   },
   "scripts": {
     "test": "node test/test"
@@ -22,7 +22,8 @@
     "validation",
     "universal",
     "schedule",
-    "standard"
+    "standard",
+    "uss"
   ],
   "license": "MIT",
   "bugs": {

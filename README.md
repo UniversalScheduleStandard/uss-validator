@@ -15,7 +15,7 @@ This package may be used either on the frontend or backend. Is is written in ECM
 Navigate to your project folder and enter the following in terminal:
 
 ```
-npm i uss-validator
+npm install uss-validator
 ```
 
 The uss-validator will be added into your project and your package.json file. 

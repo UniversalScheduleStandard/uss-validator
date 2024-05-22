@@ -1,7 +1,12 @@
 var doesObjectHaveKey = require('./doesObjectHaveKey')
 
-// doesUssObjectHaveKey
-// takes an object and a string and returns true if the object contains obj.universalScheduleStandard.string
+/**
+ * Checks if an object contains a specific key within the 'universalScheduleStandard' property.
+ *
+ * @param {Object} obj - The object to check.
+ * @param {string} key - The key to search for within the 'universalScheduleStandard' property.
+ * @returns {boolean} - Returns true if the object contains the specified key, otherwise false.
+ */
 
 module.exports = function(obj, key) {
   try {

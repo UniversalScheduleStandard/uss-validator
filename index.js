@@ -1,6 +1,16 @@
 var Ajv = require("ajv")
 
-var schema = require('./schemas/schema')
+/**
+ * UNIVERSAL SCHEDULE STANDARD VALIDATOR
+ * Takes an object or string, checks whether it's valid JSON, then validates against the USS schema.
+ * Returns an object with isValid boolean, an info object and arrays of errors and warnings, if any.
+ * This is written in ECMA Script 5 to ensure wide compatibility
+ *
+ * @param {Object|string} item - The object or string to be validated against the USS schema.
+ * @returns {Object} - An object containing the validation result, info object, and arrays of errors and warnings.
+ */
+
+var schema_v100 = require('./schemas/schema_v1.0.0')
 var error = require('./utils/errors')
 var getArrayLengthForKey = require('./utils/getArrayLengthForKey')
 var getValueForKey = require('./utils/getValueForKey')
@@ -13,13 +23,6 @@ var boardsBreakdownIdsEqualsBreakdowns = require('./parity/boardsBreakdownIdsEqu
 var boardsBreakdownIdsExistsInBreakdowns = require('./parity/boardsBreakdownIdsExistsInBreakdowns')
 var stripboardsHaveCalendar = require('./parity/stripboardsHaveCalendar')
 var calendarsHaveStart = require('./parity/calendarsHaveStart')
-
-/* 
-UNIVERSAL SCHEDULE STANDARD VALIDATOR
-Takes an object or string, checks whether it's valid JSON, then validates against the USS schema.
-Returns an object with isValid boolean, an info object and arrays of errors and warnings, if any.
-This is written in ECMA Script 5 to ensure wide compatibility
-*/
 
 // PRIMARY FUNCTION
 module.exports = function(item) {
@@ -43,13 +46,27 @@ module.exports = function(item) {
 
   try {
     if(isJson(item)) {
-      // build ajv validator
-      var ajv = new Ajv()
-      var validateUSS = ajv.compile(schema)
-
       // create an object from the JSON
       var objParsed = isJson(item, 'object')
 
+      // build ajv validator
+      var ajv = new Ajv()
+
+      // determine which schema to use
+      var validateUSS
+      switch(objParsed?.universalScheduleStandard?.ussVersion) {
+        case '1.0.0':
+          validateUSS = ajv.compile(schema_v100)
+          break
+        default:
+          break
+      }
+      if(!validateUSS) {
+        response.isValid = false
+        response.errors.push(error.createError({title: 'Schema Error', message: 'The file\'s USS version is not supported by this validator'}))
+      }
+
+      // if the object was successfully parsed
       if(objParsed!==null) {
         // check validation, collect any errors
         response.isValid = validateUSS(objParsed)

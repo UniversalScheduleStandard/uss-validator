@@ -1,4 +1,9 @@
 
+/**
+ * @module schema_v1.0.0
+ * @description This module exports a JSON schema object for the Universal Schedule Standard (USS) validator.
+ */
+
 module.exports = {
   type: 'object',
   properties: {
@@ -37,7 +42,7 @@ module.exports = {
               scene: {type: 'string', nullable: true},
               scriptPage: {type: 'string', nullable: true},
               duration: {type: 'number', minimum: 0, nullable: true},
-              type: {type: 'string', enum: ['scene','day','banner']}
+              type: {type: 'string', enum: ['scene','banner']}
             },
             required: ['id', 'bannerText', 'comments', 'created', 'description', 'elements', 'pages', 'scene', 'scriptPage', 'duration', 'type'],
             additionalProperties: false

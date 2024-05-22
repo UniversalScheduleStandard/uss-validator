@@ -1,8 +1,12 @@
 var warning = require('../utils/warnings')
 var uniq = require('../utils/uniq')
 
-// elementsBelongToCategories
-// are there any elements that don't belong to a category?
+/**
+ * Checks if there are any elements that don't belong to a category.
+ * @param {Object} obj - The object containing the universal schedule standard.
+ * @param {Array} warnings - The array to store warning messages.
+ * @returns {Array} - The updated array of warning messages.
+ */
 
 module.exports = function(obj, warnings) {
   try {

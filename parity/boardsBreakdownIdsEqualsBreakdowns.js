@@ -1,8 +1,13 @@
 var warning = require('../utils/warnings')
 var uniq = require('../utils/uniq')
 
-// boardsBreakdownIdsEqualsBreakdowns
-// do all stripboard.boards.breakdownIds equal the number of breakdowns?
+/**
+ * Checks if all stripboard.boards.breakdownIds equal the number of breakdowns.
+ *
+ * @param {Object} obj - The object containing the stripboards and breakdowns.
+ * @param {Array} warnings - The array to store any warnings.
+ * @returns {Array} - The updated warnings array.
+ */
 
 module.exports = function(obj, warnings) {
   try {

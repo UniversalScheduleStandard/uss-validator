@@ -1,8 +1,13 @@
 var doesUssObjectHaveKey = require('./doesUssObjectHaveKey')
 var isUssObjectKeyAnArray = require('./isUssObjectKeyAnArray')
 
-// getArrayLengthForKey
-// take uss object and key string, return the array length of the object.key
+/**
+ * @module getArrayLengthForKey
+ * @description Takes a uss object and a key string, and returns the array length of the object.key.
+ * @param {Object} obj - The uss object.
+ * @param {string} key - The key string.
+ * @returns {number|null} The array length of the object.key, or null if the key is not found or not an array.
+ */
 
 module.exports = function(obj, key) {
   try {

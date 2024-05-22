@@ -1,8 +1,12 @@
 var warning = require('../utils/warnings')
 var uniq = require('../utils/uniq')
 
-// elementsHaveCategory
-// do all elements have a category ID that matches a category object
+/**
+ * Checks if all elements have a category ID that matches a category object.
+ * @param {Object} obj - The object containing the elements and categories.
+ * @param {Array} warnings - The array to store any warnings.
+ * @returns {Array} - The updated array of warnings.
+ */
 
 module.exports = function(obj, warnings) {
   try {
